@@ -1,0 +1,18 @@
+{
+  "name": "@saasquatch/scoped-autobindsteps",
+  "version": "1.0.0",
+  "description": "A replacement for jest-cucumber's autoBindSteps that doesn't use global scope.",
+  "source": "src/universal-hooks.ts",
+  "main": "dist/universal-hooks.js",
+  "types": "dist/universal-hooks.d.ts",
+  "scripts": {
+    "build": "microbundle"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "microbundle": "^0.13.0",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {}
+}
