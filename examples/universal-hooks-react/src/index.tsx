@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {setImplementation} from '../../../dist/universal-hooks'
+
+setImplementation(React);
 
 ReactDOM.render(
   <React.StrictMode>

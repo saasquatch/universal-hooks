@@ -42,12 +42,13 @@ const impl: Ref<HookLib> = {
   } as unknown) as HookLib,
 };
 
+export function setImplementation(lib: any) {
+  impl.current = lib
+}
+
 function unimplemented() {
   throw new Error("No implementation defined for universal hooks");
 }
-
-// export const useState: UseStateFunc = (...args) =>
-//   impl.current.useState(...args);
 
 export function useState<T>(init: T | (() => T)): [T, Dispatch<SetState<T>>] {
   return impl.current.useState(init);
