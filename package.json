@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/universal-hooks",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An interface and a swappable implementation that can be used to implement universal custom hooks on top of hooks.",
   "private": false,
   "source": "src/universal-hooks.ts",
