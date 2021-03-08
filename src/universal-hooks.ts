@@ -12,12 +12,6 @@ type Ref<T> = {
 
 type Deps = readonly any[];
 
-// these seem pretty implementation dependent, any is fine
-interface Context {
-  Provider: any;
-  Consumer: any;
-}
-
 type HookLib = {
   useState: typeof useState;
   useMemo: typeof useMemo;
@@ -70,7 +64,7 @@ export function useLayoutEffect(effect: EffectCallback, deps?: Deps): void {
   return impl.current.useLayoutEffect(effect, deps);
 }
 
-export function useContext<T>(ctx: Context): T {
+export function useContext<T>(ctx: unknown): T {
   return impl.current.useContext(ctx);
 }
 
