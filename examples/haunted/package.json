@@ -1,7 +1,6 @@
 {
-  "name": "universal-hooks-test",
+  "name": "@saasquatch/universal-hooks-test",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "start": "http-server ../../"
   },
