@@ -1,0 +1,12 @@
+{
+  "name": "universal-hooks-test",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "http-server ../../"
+  },
+  "dependencies": {
+    "http-server": "^0.12.3"
+  },
+  "devDependencies": {}
+}
