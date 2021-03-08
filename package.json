@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/universal-hooks",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An interface and a swappable implementation that can be used to implement universal custom hooks on top of hooks.",
   "private": false,
   "source": "src/universal-hooks.ts",
@@ -9,12 +9,13 @@
   "scripts": {
     "build": "microbundle"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "microbundle": "^0.13.0",
-    "typescript": "^4.2.3"
+    "microbundle": "^0.13.0"
   },
   "dependencies": {}
 }
