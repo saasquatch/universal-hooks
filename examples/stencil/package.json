@@ -1,0 +1,32 @@
+{
+  "name": "universal-hooks-test",
+  "version": "0.0.1",
+  "description": "Stencil Component Starter",
+  "main": "dist/index.cjs.js",
+  "module": "dist/custom-elements/index.js",
+  "es2015": "dist/esm/index.mjs",
+  "es2017": "dist/esm/index.mjs",
+  "types": "dist/custom-elements/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "unpkg": "dist/universal-hooks-test/universal-hooks-test.esm.js",
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "scripts": {
+    "build": "stencil build --docs",
+    "start": "stencil build --dev --watch --serve",
+    "test": "stencil test --spec --e2e",
+    "test.watch": "stencil test --spec --e2e --watchAll",
+    "generate": "stencil generate"
+  },
+  "dependencies": {
+    "@rollup/plugin-alias": "^3.1.2",
+    "@saasquatch/stencil-hooks": "^1.0.1",
+    "@saasquatch/universal-hooks": "^0.1.2",
+    "@stencil/core": "^1.17.4",
+    "lodash": "^4.17.21"
+  },
+  "license": "MIT"
+}
