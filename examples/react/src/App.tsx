@@ -27,9 +27,6 @@ function App() {
       <h2>useContext</h2>
       <UseContextTest />
       <hr />
-      <h2>useLayoutEffect</h2>
-      <UseLayoutEffectTest />
-      <hr />
       <h2>useReducer</h2>
       <UseReducerTest />
       <hr />
@@ -166,43 +163,6 @@ function formatDate(date: Date): string {
 
 function timestampNow(): string {
   return formatDate(new Date(Date.now()));
-}
-
-function UseLayoutEffectTest() {
-  const [logs, setLogs] = useState<string[]>([]);
-  const [counter, setCounter] = useState(0);
-  function inc() {
-    setCounter(counter + 1);
-  }
-  function dec() {
-    setCounter((c) => c - 1);
-  }
-
-  useEffect(() => {
-    setLogs((L) => [...L, timestampNow() + ": useEffect called!"]);
-  }, [counter]);
-
-  useLayoutEffect(() => {
-    setLogs((L) => [...L, timestampNow() + ": useLayoutEffect called!"]);
-  }, [counter]);
-
-  return (
-    <>
-      <div>
-        <p>Counter: {counter}</p>
-      </div>
-      <div>
-        <button onClick={inc}>Increment</button>
-        <button onClick={dec}>Decrement</button>
-      </div>
-      <ul>
-        {logs.map((entry) => (
-          <li key={entry}>{entry}</li>
-        ))}
-      </ul>
-      <button onClick={()=>setLogs([])}>Clear logs</button>
-    </>
-  );
 }
 
 function reducer(prev: number, action: "INC" | "DEC") {

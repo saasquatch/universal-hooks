@@ -19,10 +19,6 @@ customElements.define("my-counter", haunted.component(Counter));
 customElements.define("use-state-test", haunted.component(UseStateTest));
 customElements.define("use-effect-test", haunted.component(UseEffectTest));
 customElements.define("use-context-test", haunted.component(UseContextTest));
-customElements.define(
-  "use-layout-effect-test",
-  haunted.component(UseLayoutEffectTest)
-);
 customElements.define("use-reducer-test", haunted.component(UseReducerTest));
 customElements.define("use-callback-test", haunted.component(UseCallbackTest));
 customElements.define("use-memo-test", haunted.component(UseMemoTest));
@@ -163,41 +159,6 @@ function formatDate(date) {
 
 function timestampNow() {
   return formatDate(new Date(Date.now()));
-}
-
-function UseLayoutEffectTest() {
-  const [logs, setLogs] = useState([]);
-  const [counter, setCounter] = useState(0);
-  function inc() {
-    setCounter(counter + 1);
-  }
-  function dec() {
-    setCounter((c) => c - 1);
-  }
-
-  useEffect(() => {
-    setLogs((L) => [...L, timestampNow() + ": useEffect called!"]);
-  }, [counter]);
-
-  useLayoutEffect(() => {
-    setLogs((L) => [...L, timestampNow() + ": useLayoutEffect called!"]);
-  }, [counter]);
-
-  return html`
-    <div>
-      <div>
-        <p>Counter: ${counter}</p>
-      </div>
-      <div>
-        <button @click=${inc}>Increment</button>
-        <button @click=${dec}>Decrement</button>
-      </div>
-      <ul>
-        ${logs.map((entry) => html` <li key=${entry}>${entry}</li> `)}
-      </ul>
-      <button @click=${() => setLogs([])}>Clear logs</button>
-    </div>
-  `;
 }
 
 function reducer(prev, action) {
