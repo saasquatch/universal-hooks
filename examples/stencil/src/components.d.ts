@@ -10,8 +10,6 @@ export namespace Components {
     }
     interface UseCallbackTest {
     }
-    interface UseContextTest {
-    }
     interface UseEffectTest {
     }
     interface UseMemoTest {
@@ -35,12 +33,6 @@ declare global {
     var HTMLUseCallbackTestElement: {
         prototype: HTMLUseCallbackTestElement;
         new (): HTMLUseCallbackTestElement;
-    };
-    interface HTMLUseContextTestElement extends Components.UseContextTest, HTMLStencilElement {
-    }
-    var HTMLUseContextTestElement: {
-        prototype: HTMLUseContextTestElement;
-        new (): HTMLUseContextTestElement;
     };
     interface HTMLUseEffectTestElement extends Components.UseEffectTest, HTMLStencilElement {
     }
@@ -75,7 +67,6 @@ declare global {
     interface HTMLElementTagNameMap {
         "boiler-plate": HTMLBoilerPlateElement;
         "use-callback-test": HTMLUseCallbackTestElement;
-        "use-context-test": HTMLUseContextTestElement;
         "use-effect-test": HTMLUseEffectTestElement;
         "use-memo-test": HTMLUseMemoTestElement;
         "use-reducer-test": HTMLUseReducerTestElement;
@@ -87,8 +78,6 @@ declare namespace LocalJSX {
     interface BoilerPlate {
     }
     interface UseCallbackTest {
-    }
-    interface UseContextTest {
     }
     interface UseEffectTest {
     }
@@ -103,7 +92,6 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "boiler-plate": BoilerPlate;
         "use-callback-test": UseCallbackTest;
-        "use-context-test": UseContextTest;
         "use-effect-test": UseEffectTest;
         "use-memo-test": UseMemoTest;
         "use-reducer-test": UseReducerTest;
@@ -117,7 +105,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "boiler-plate": LocalJSX.BoilerPlate & JSXBase.HTMLAttributes<HTMLBoilerPlateElement>;
             "use-callback-test": LocalJSX.UseCallbackTest & JSXBase.HTMLAttributes<HTMLUseCallbackTestElement>;
-            "use-context-test": LocalJSX.UseContextTest & JSXBase.HTMLAttributes<HTMLUseContextTestElement>;
             "use-effect-test": LocalJSX.UseEffectTest & JSXBase.HTMLAttributes<HTMLUseEffectTestElement>;
             "use-memo-test": LocalJSX.UseMemoTest & JSXBase.HTMLAttributes<HTMLUseMemoTestElement>;
             "use-reducer-test": LocalJSX.UseReducerTest & JSXBase.HTMLAttributes<HTMLUseReducerTestElement>;

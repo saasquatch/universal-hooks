@@ -17,7 +17,6 @@ type HookLib = {
   useMemo: typeof useMemo;
   useCallback: typeof useCallback;
   useEffect: typeof useEffect;
-  useContext: typeof useContext;
   useReducer: typeof useReducer;
   useRef: typeof useRef;
 };
@@ -28,7 +27,6 @@ const impl: Ref<HookLib> = {
     useMemo: unimplemented,
     useCallback: unimplemented,
     useEffect: unimplemented,
-    useContext: unimplemented,
     useReducer: unimplemented,
     useRef: unimplemented,
   } as unknown) as HookLib,
@@ -56,10 +54,6 @@ export function useCallback<T extends Function>(callback: T, deps: Deps): T {
 
 export function useEffect(effect: EffectCallback, deps?: Deps): void {
   return impl.current.useEffect(effect, deps);
-}
-
-export function useContext<T>(ctx: unknown): T {
-  return impl.current.useContext(ctx);
 }
 
 export function useReducer<S, A>(

@@ -18,7 +18,6 @@ setImplementation(haunted);
 customElements.define("my-counter", haunted.component(Counter));
 customElements.define("use-state-test", haunted.component(UseStateTest));
 customElements.define("use-effect-test", haunted.component(UseEffectTest));
-customElements.define("use-context-test", haunted.component(UseContextTest));
 customElements.define("use-reducer-test", haunted.component(UseReducerTest));
 customElements.define("use-callback-test", haunted.component(UseCallbackTest));
 customElements.define("use-memo-test", haunted.component(UseMemoTest));
@@ -88,52 +87,6 @@ function UseEffectTest() {
           @input=${(e) => setText2(e.target.value)}
         />
         <p><strong>Text:</strong> ${displayText2}</p>
-      </div>
-    </div>
-  `;
-}
-
-const Ctx = haunted.createContext(9999);
-customElements.define("ctx-provider", Ctx.Provider);
-customElements.define("ctx-consumer", Ctx.Consumer);
-
-function ConsumerDisplay() {
-  return html`<ctx-consumer
-    .render=${(value) => html`<p>Counter: ${value}</p>`}
-  ></ctx-consumer>`;
-}
-customElements.define("consumer-display", haunted.component(ConsumerDisplay));
-
-function UseContextDisplay() {
-  return html`<p>Counter: ${useContext(Ctx)}</p>`;
-}
-customElements.define(
-  "use-context-display",
-  haunted.component(UseContextDisplay)
-);
-
-function UseContextTest() {
-  const [counter, setCounter] = useState(0);
-  function inc() {
-    setCounter(counter + 1);
-  }
-  function dec() {
-    setCounter((c) => c - 1);
-  }
-
-  return html`
-    <div>
-      <div>
-        <button @click=${inc}>Increment</button>
-        <button @click=${dec}>Decrement</button>
-      </div>
-      <div style="border: solid; margin: 15px; padding: 10px">
-        <ctx-provider .value=${counter}>
-          <h3>Consumer</h3>
-          <consumer-display></consumer-display>
-          <h3>useContext</h3>
-          <use-context-display></use-context-display>
-        </ctx-provider>
       </div>
     </div>
   `;

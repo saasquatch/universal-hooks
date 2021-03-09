@@ -24,9 +24,6 @@ function App() {
       <h2>useEffect</h2>
       <UseEffectTest />
       <hr />
-      <h2>useContext</h2>
-      <UseContextTest />
-      <hr />
       <h2>useReducer</h2>
       <UseReducerTest />
       <hr />
@@ -104,43 +101,6 @@ function UseEffectTest() {
       </div>
     </>
   );
-}
-
-const Ctx = React.createContext(9999);
-
-function UseContextTest() {
-  const [counter, setCounter] = useState(0);
-  function inc() {
-    setCounter(counter + 1);
-  }
-  function dec() {
-    setCounter((c) => c - 1);
-  }
-
-  return (
-    <>
-      <div>
-        <button onClick={inc}>Increment</button>
-        <button onClick={dec}>Decrement</button>
-      </div>
-      <div style={{ borderStyle: "solid", margin: 15, padding: 10 }}>
-        <Ctx.Provider value={counter}>
-          <h3>Consumer</h3>
-          <ConsumerDisplay />
-          <h3>useContext</h3>
-          <UseContextDisplay />
-        </Ctx.Provider>
-      </div>
-    </>
-  );
-}
-
-function ConsumerDisplay() {
-  return <Ctx.Consumer>{(value) => <p>Counter: {value}</p>}</Ctx.Consumer>;
-}
-
-function UseContextDisplay() {
-  return <p>Counter: {useContext(Ctx)}</p>;
 }
 
 function formatDate(date: Date): string {
