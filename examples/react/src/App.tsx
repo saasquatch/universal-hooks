@@ -1,17 +1,12 @@
-import React from "react";
 import {
   useCallback,
-  useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
-} from "../../../dist/universal-hooks";
+} from "@saasquatch/universal-hooks";
 import _ from "lodash";
-
-import "./App.css";
 
 function App() {
   return (

@@ -24,7 +24,6 @@
   "dependencies": {
     "@rollup/plugin-alias": "^3.1.2",
     "@saasquatch/stencil-hooks": "^1.0.1",
-    "@saasquatch/universal-hooks": "^0.1.2",
     "@stencil/core": "^1.17.4",
     "lodash": "^4.17.21"
   },

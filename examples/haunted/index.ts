@@ -1,17 +1,15 @@
-import { html } from "https://unpkg.com/lit-html/lit-html.js";
-import * as haunted from "https://unpkg.com/haunted/haunted.js";
-import "https://unpkg.com/lodash/lodash.js";
+import { html } from "lit-html";
+import * as haunted from "haunted";
+import _ from "lodash";
 import {
   setImplementation,
-  useCallback,
-  useContext,
   useEffect,
-  useLayoutEffect,
+  useCallback,
   useMemo,
   useReducer,
   useRef,
   useState,
-} from "../../dist/universal-hooks.modern.js";
+} from "@saasquatch/universal-hooks";
 
 setImplementation(haunted);
 

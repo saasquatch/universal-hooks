@@ -1,0 +1,30 @@
+{
+  "name": "@saasquatch/universal-hooks-testing-library",
+  "version": "0.1.0",
+  "description": "A testing library for universal-hooks",
+  "private": false,
+  "main": "dist/index.js",
+  "source": "src/index.ts",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "microbundle",
+    "test": "jest",
+    "test-watch": "jest --watch"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@jest/types": "^26.6.2",
+    "@saasquatch/universal-hooks": "^0.1.3",
+    "@testing-library/react-hooks": "^5.1.0",
+    "haunted": "^4.7.1",
+    "jest": "^26.6.3",
+    "jest-cucumber": "^3.0.1",
+    "microbundle": "^0.13.0",
+    "prop-types": "^15.7.2",
+    "react-test-renderer": "^17.0.1",
+    "ts-jest": "^26.5.3",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
+}
