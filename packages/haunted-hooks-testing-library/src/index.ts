@@ -52,3 +52,23 @@ export function act(cb: () => void | undefined): void;
 export function act(cb: () => any): any {
   return Promise.resolve(cb());
 }
+
+export async function waitForNextUpdate(options?: {
+  timeout?: number | false;
+}): Promise<void> {}
+
+export async function waitFor(
+  callback: () => boolean | void,
+  options?: {
+    interval?: number | false;
+    timeout?: number | false;
+  }
+): Promise<void> {}
+
+export async function waitForValueToChange(
+  selector: () => any,
+  options?: {
+    interval?: number | false;
+    timeout?: number | false;
+  }
+): Promise<void> {}
