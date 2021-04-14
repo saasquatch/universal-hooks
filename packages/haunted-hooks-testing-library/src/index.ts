@@ -1,4 +1,6 @@
 import { State } from "haunted";
+import { Subject } from "rxjs";
+import { timeout } from "rxjs/operators";
 
 class Result<T> {
   private _current: T;
@@ -37,14 +39,19 @@ export function renderHook<P, R>(
   ) => Promise<void>;
   unmount: () => void;
 } {
+  const updateSubject = new Subject<R>();
+
   let result = new Result<R>();
+
   let state = new State(() => {
     update(options.initialProps);
   }, null);
 
   function update(props) {
     state.run(() => {
-      result.current = hook(props);
+      const res = hook(props);
+      result.current = res;
+      updateSubject.next(res);
     });
   }
 
@@ -57,7 +64,24 @@ export function renderHook<P, R>(
 
   async function waitForNextUpdate(options?: {
     timeout?: number | false;
-  }): Promise<void> {}
+  }): Promise<void> {
+    let resolve: () => void;
+    const promise = new Promise<void>((r) => {
+      resolve = r;
+    });
+
+    const timeoutMs: number | false = options?.timeout ?? 1000;
+
+    const timeObserver = timeoutMs
+      ? updateSubject.pipe(timeout(timeoutMs))
+      : updateSubject;
+
+    // resolve the promise on any update
+    timeObserver.subscribe(() => {
+      resolve();
+    });
+    return promise;
+  }
 
   async function waitFor(
     callback: () => boolean | void,

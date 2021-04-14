@@ -13,7 +13,7 @@ describe("Async Utils", () => {
     function hook() {
       const [counter, setCounter] = useState(0);
 
-      setTimeout(() => setCounter((c) => c + 1), 100);
+      setTimeout(() => setCounter((c) => c + 1), 10);
 
       return {
         counter,
@@ -23,12 +23,13 @@ describe("Async Utils", () => {
 
     const {result, waitForNextUpdate} = renderHook(hook)
 
-    expect(result.current.counter).toBe(0)
+    expect(result.current.counter).toBe(0);
     await waitForNextUpdate();
-    expect(result.current.counter).toBe(1)
+    expect(result.current.counter).toBe(1);
     await waitForNextUpdate();
-    expect(result.current.counter).toBe(2)
+    expect(result.current.counter).toBe(2);
   });
+  test.todo("waitForNextUpdate w/ timeout")
 });
 
 // BUG issues with props and stuff
