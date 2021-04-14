@@ -20,6 +20,21 @@ export function renderHook<P, R>(
 ): {
   result: Result<R>;
   rerender: (props?: P) => void;
+  waitForNextUpdate: (options?: { timeout?: number | false }) => Promise<void>;
+  waitFor: (
+    callback: () => boolean | void,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  waitForValueToChange: (
+    selector: () => any,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
   unmount: () => void;
 } {
   let result = new Result<R>();
@@ -40,10 +55,33 @@ export function renderHook<P, R>(
   }
   rerender(options.initialProps);
 
+  async function waitForNextUpdate(options?: {
+    timeout?: number | false;
+  }): Promise<void> {}
+
+  async function waitFor(
+    callback: () => boolean | void,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ): Promise<void> {}
+
+  async function waitForValueToChange(
+    selector: () => any,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ): Promise<void> {}
+
   return {
     result,
     rerender,
     unmount: () => state.teardown(),
+    waitFor,
+    waitForNextUpdate,
+    waitForValueToChange,
   };
 }
 
@@ -52,23 +90,3 @@ export function act(cb: () => void | undefined): void;
 export function act(cb: () => any): any {
   return Promise.resolve(cb());
 }
-
-export async function waitForNextUpdate(options?: {
-  timeout?: number | false;
-}): Promise<void> {}
-
-export async function waitFor(
-  callback: () => boolean | void,
-  options?: {
-    interval?: number | false;
-    timeout?: number | false;
-  }
-): Promise<void> {}
-
-export async function waitForValueToChange(
-  selector: () => any,
-  options?: {
-    interval?: number | false;
-    timeout?: number | false;
-  }
-): Promise<void> {}

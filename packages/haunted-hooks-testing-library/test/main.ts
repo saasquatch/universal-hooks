@@ -8,6 +8,29 @@ import {
 } from "haunted";
 import { act, renderHook } from "../src";
 
+describe("Async Utils", () => {
+  test("waitForNextUpdate", async () => {
+    function hook() {
+      const [counter, setCounter] = useState(0);
+
+      setTimeout(() => setCounter((c) => c + 1), 100);
+
+      return {
+        counter,
+        setCounter,
+      };
+    }
+
+    const {result, waitForNextUpdate} = renderHook(hook)
+
+    expect(result.current.counter).toBe(0)
+    await waitForNextUpdate();
+    expect(result.current.counter).toBe(1)
+    await waitForNextUpdate();
+    expect(result.current.counter).toBe(2)
+  });
+});
+
 // BUG issues with props and stuff
 describe("useState", () => {
   test("no props", () => {
