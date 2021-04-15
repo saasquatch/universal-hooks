@@ -97,17 +97,14 @@ export function renderHook<P, R>(
     const timeoutMs: number | false = options?.timeout ?? 1000;
     const intervalMs: number | false = options?.interval ?? 50;
 
-    const updateObservable = (timeoutMs
+    const updateObservable = timeoutMs
       ? updateSubject.pipe(timeout(timeoutMs))
-      : updateSubject
-    ).pipe(filter(shouldResolve), first());
+      : updateSubject;
 
-    const intervalObservable = intervalMs
-      ? interval(intervalMs).pipe(filter(shouldResolve), first())
-      : NEVER;
+    const intervalObservable = intervalMs ? interval(intervalMs) : NEVER;
 
-    const mergedPromise = race(updateObservable, intervalObservable)
-      .pipe(first(), mapTo(undefined))
+    const mergedPromise = merge(updateObservable, intervalObservable)
+      .pipe(filter(shouldResolve), first(), mapTo(undefined))
       .toPromise();
 
     return mergedPromise;
