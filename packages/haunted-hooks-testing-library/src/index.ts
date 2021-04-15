@@ -1,6 +1,15 @@
 import { State } from "haunted";
-import { interval, NEVER, race, Subject } from "rxjs";
-import { filter, first, mapTo, timeout } from "rxjs/operators";
+import { interval, merge, NEVER, race, Subject } from "rxjs";
+import {
+  distinct,
+  filter,
+  first,
+  map,
+  mapTo,
+  skip,
+  tap,
+  timeout,
+} from "rxjs/operators";
 
 class Result<T> {
   private _current: T;
@@ -116,7 +125,24 @@ export function renderHook<P, R>(
       interval?: number | false;
       timeout?: number | false;
     }
-  ): Promise<void> {}
+  ): Promise<void> {
+    const initialValue = selector();
+
+    const timeoutMs: number | false = options?.timeout ?? 1000;
+    const intervalMs: number | false = options?.interval ?? 50;
+
+    const updateObservable = timeoutMs
+      ? updateSubject.pipe(timeout(timeoutMs))
+      : updateSubject;
+
+    const intervalObservable = intervalMs ? interval(intervalMs) : NEVER;
+
+    const mergedPromise = merge(updateObservable, intervalObservable)
+      .pipe(filter(() => selector() !== initialValue), first(), mapTo(undefined))
+      .toPromise();
+
+    return mergedPromise;
+  }
 
   return {
     result,

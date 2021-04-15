@@ -211,6 +211,128 @@ describe("Async Utils", () => {
       expect(result.current.counter.current).toBe(4);
     });
   });
+
+  describe("waitForValueToChange", () => {
+    test("resolve when value changes", async () => {
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 10);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitForValueToChange } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      await waitForValueToChange(() => result.current.counter === 2);
+      expect(result.current.counter).toBe(2);
+
+      await waitForValueToChange(() => result.current.counter);
+      expect(result.current.counter).toBe(3);
+    });
+
+    //*
+    test("timeout expiry", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 10);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitForValueToChange } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      await waitForValueToChange(() => result.current.counter === 1);
+      expect(result.current.counter).toBe(1);
+
+      try {
+        await waitForValueToChange(() => result.current.counter, { timeout: 1 });
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(1);
+
+      await waitForValueToChange(() => result.current.counter);
+      expect(result.current.counter).toBe(2);
+    });
+
+    test("default timeout", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 2000);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitForValueToChange } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      try {
+        await waitForValueToChange(() => result.current.counter);
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(0);
+    });
+
+    // use useRef to test this one, we can't trigger updates
+    test("resolve during interval with no updates", async () => {
+      function hook() {
+        const counter = useRef(0);
+
+        function increment() {
+          setTimeout(() => {
+            counter.current++;
+            increment(); // this leaks memory because no TCO in Node
+          }, 10);
+        }
+
+        increment();
+
+        return {
+          counter,
+        };
+      }
+
+      const { result, waitForValueToChange } = renderHook(hook);
+
+      expect(result.current.counter.current).toBe(0);
+
+      await waitForValueToChange(() => result.current.counter.current === 2, {
+        interval: 2,
+      });
+      expect(result.current.counter.current).toBe(2);
+
+      await waitForValueToChange(() => result.current.counter.current, {
+        interval: 2,
+      });
+      expect(result.current.counter.current).toBe(3);
+    });
+    //*
+    //*/
+  })
 });
 
 describe("useState", () => {
