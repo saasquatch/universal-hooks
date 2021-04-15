@@ -1,6 +1,6 @@
 import { State } from "haunted";
-import { Subject } from "rxjs";
-import { first, mapTo, timeout } from "rxjs/operators";
+import { interval, NEVER, race, Subject } from "rxjs";
+import { filter, first, mapTo, timeout } from "rxjs/operators";
 
 class Result<T> {
   private _current: T;
@@ -69,11 +69,11 @@ export function renderHook<P, R>(
   }): Promise<void> {
     const timeoutMs: number | false = options?.timeout ?? 1000;
 
-    const timeObserver = timeoutMs
+    const updateObservable = timeoutMs
       ? updateSubject.pipe(timeout(timeoutMs))
       : updateSubject;
 
-    return timeObserver.pipe(first(), mapTo(null)).toPromise();
+    return updateObservable.pipe(first(), mapTo(undefined)).toPromise();
   }
 
   async function waitFor(
@@ -82,7 +82,36 @@ export function renderHook<P, R>(
       interval?: number | false;
       timeout?: number | false;
     }
-  ): Promise<void> {}
+  ): Promise<void> {
+    // should resolve promise if callback returns truthy or undefined
+    // callback can error
+    function shouldResolve() {
+      try {
+        const res = callback();
+        return res === undefined || !!res;
+      } catch {
+        return false;
+      }
+    }
+
+    const timeoutMs: number | false = options?.timeout ?? 1000;
+    const intervalMs: number | false = options?.interval ?? 50;
+
+    const updateObservable = (timeoutMs
+      ? updateSubject.pipe(timeout(timeoutMs))
+      : updateSubject
+    ).pipe(filter(shouldResolve), first());
+
+    const intervalObservable = intervalMs
+      ? interval(intervalMs).pipe(filter(shouldResolve), first())
+      : NEVER;
+
+    const mergedPromise = race(updateObservable, intervalObservable)
+      .pipe(first(), mapTo(undefined))
+      .toPromise();
+
+    return mergedPromise;
+  }
 
   async function waitForValueToChange(
     selector: () => any,

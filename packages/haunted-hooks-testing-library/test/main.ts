@@ -91,9 +91,128 @@ describe("Async Utils", () => {
       expect(result.current.counter).toBe(0);
     });
   });
+
+  describe("waitFor", () => {
+    // test truthy, false, undefined, and error states
+    test("resolve when callback returns truthy or undefined", async () => {
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 10);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitFor } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      await waitFor(() => result.current.counter === 2);
+      expect(result.current.counter).toBe(2);
+
+      await waitFor(() => expect(result.current.counter).toBe(4));
+      expect(result.current.counter).toBe(4);
+    });
+
+    test("timeout expiry", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 10);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitFor } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      await waitFor(() => result.current.counter === 1);
+      expect(result.current.counter).toBe(1);
+
+      try {
+        await waitFor(() => result.current.counter === 2, { timeout: 1 });
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(1);
+
+      await waitFor(() => result.current.counter === 2);
+      expect(result.current.counter).toBe(2);
+    });
+
+    test("default timeout", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 2000);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitFor } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      try {
+        await waitFor(() => result.current.counter === 2);
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(0);
+    });
+
+    // use useRef to test this one, we can't trigger updates
+    test("resolve during interval with no updates", async () => {
+      function hook() {
+        const counter = useRef(0);
+
+        function increment() {
+          setTimeout(() => {
+            counter.current++;
+            increment(); // this leaks memory because no TCO in Node
+          }, 10);
+        }
+
+        increment();
+
+        return {
+          counter,
+        };
+      }
+
+      const { result, waitFor } = renderHook(hook);
+
+      expect(result.current.counter.current).toBe(0);
+
+      await waitFor(() => result.current.counter.current === 2, {
+        interval: 2,
+      });
+      expect(result.current.counter.current).toBe(2);
+
+      await waitFor(() => expect(result.current.counter.current).toBe(4), {
+        interval: 2,
+      });
+      expect(result.current.counter.current).toBe(4);
+    });
+  });
 });
 
-// BUG issues with props and stuff
 describe("useState", () => {
   test("no props", () => {
     const { result } = renderHook(useState);
