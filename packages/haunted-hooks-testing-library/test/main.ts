@@ -9,27 +9,88 @@ import {
 import { act, renderHook } from "../src";
 
 describe("Async Utils", () => {
-  test("waitForNextUpdate", async () => {
-    function hook() {
-      const [counter, setCounter] = useState(0);
+  describe("waitForNextUpdate", () => {
+    test("default", async () => {
+      function hook() {
+        const [counter, setCounter] = useState(0);
 
-      setTimeout(() => setCounter((c) => c + 1), 10);
+        setTimeout(() => setCounter((c) => c + 1), 10);
 
-      return {
-        counter,
-        setCounter,
-      };
-    }
+        return {
+          counter,
+          setCounter,
+        };
+      }
 
-    const {result, waitForNextUpdate} = renderHook(hook)
+      const { result, waitForNextUpdate } = renderHook(hook);
 
-    expect(result.current.counter).toBe(0);
-    await waitForNextUpdate();
-    expect(result.current.counter).toBe(1);
-    await waitForNextUpdate();
-    expect(result.current.counter).toBe(2);
+      expect(result.current.counter).toBe(0);
+      await waitForNextUpdate();
+      expect(result.current.counter).toBe(1);
+      await waitForNextUpdate();
+      expect(result.current.counter).toBe(2);
+    });
+
+    test("timeout expiry", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 10);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitForNextUpdate } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      await waitForNextUpdate();
+      expect(result.current.counter).toBe(1);
+
+      try {
+        await waitForNextUpdate({ timeout: 1 });
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(1);
+
+      await waitForNextUpdate();
+      expect(result.current.counter).toBe(2);
+    });
+
+    test("default timeout", async () => {
+      let error: Error;
+
+      function hook() {
+        const [counter, setCounter] = useState(0);
+
+        setTimeout(() => setCounter((c) => c + 1), 2000);
+
+        return {
+          counter,
+          setCounter,
+        };
+      }
+
+      const { result, waitForNextUpdate } = renderHook(hook);
+
+      expect(result.current.counter).toBe(0);
+
+      try {
+        await waitForNextUpdate();
+      } catch (e) {
+        error = e;
+      }
+      expect(error?.name).toBe("TimeoutError");
+      expect(result.current.counter).toBe(0);
+    });
   });
-  test.todo("waitForNextUpdate w/ timeout")
 });
 
 // BUG issues with props and stuff
@@ -157,7 +218,7 @@ describe("useEffect", () => {
       return { stateA, stateB, setStateA, setStateB };
     }
 
-    const { result, rerender } = renderHook(myHook);
+    const { result } = renderHook(myHook);
 
     expect(result.current.stateA).toBe("Triggered A");
     expect(result.current.stateB).toBe("Triggered B");
