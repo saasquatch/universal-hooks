@@ -16,10 +16,7 @@ class Result<T> {
   }
 }
 
-export function renderHook<P, R>(
-  hook: (props: P) => R,
-  options: { initialProps?: P } = {}
-): {
+type RenderHookReturn<P, R> = {
   result: Result<R>;
   rerender: (props?: P) => void;
   waitForNextUpdate: (options?: { timeout?: number | false }) => Promise<void>;
@@ -38,7 +35,12 @@ export function renderHook<P, R>(
     }
   ) => Promise<void>;
   unmount: () => void;
-} {
+};
+
+export function renderHook<P, R>(
+  hook: (props: P) => R,
+  options: { initialProps?: P } = {}
+): RenderHookReturn<P, R> {
   const updateSubject = new Subject<R>();
 
   let result = new Result<R>();
@@ -65,35 +67,26 @@ export function renderHook<P, R>(
   async function waitForNextUpdate(options?: {
     timeout?: number | false;
   }): Promise<void> {
-    // let resolve: () => void;
-    // const promise = new Promise<void>((r) => {
-    //   resolve = r;
-    // });
-
     const timeoutMs: number | false = options?.timeout ?? 1000;
 
     const timeObserver = timeoutMs
       ? updateSubject.pipe(timeout(timeoutMs))
       : updateSubject;
 
-    // // resolve the promise on any update
-    // timeObserver.subscribe(() => {
-    //   resolve();
-    // });
     return timeObserver.pipe(first(), mapTo(null)).toPromise();
   }
 
   async function waitFor(
-    _callback: () => boolean | void,
-    _options?: {
+    callback: () => boolean | void,
+    options?: {
       interval?: number | false;
       timeout?: number | false;
     }
   ): Promise<void> {}
 
   async function waitForValueToChange(
-    _selector: () => any,
-    _options?: {
+    selector: () => any,
+    options?: {
       interval?: number | false;
       timeout?: number | false;
     }
