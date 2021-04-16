@@ -1,18 +1,9 @@
 import { State } from "haunted";
 import { interval, merge, NEVER, race, Subject } from "rxjs";
-import {
-  distinct,
-  filter,
-  first,
-  map,
-  mapTo,
-  skip,
-  tap,
-  timeout,
-} from "rxjs/operators";
+import { filter, first, mapTo, timeout } from "rxjs/operators";
 
 class Result<T> {
-  private _current: T;
+  private _current: T | undefined;
 
   constructor() {
     this._current = undefined;
@@ -45,20 +36,50 @@ type RenderHookReturn<P, R> = {
   ) => Promise<void>;
   unmount: () => void;
 };
+type RenderHookReturnVoid<R> = {
+  result: Result<R>;
+  rerender: () => void;
+  waitForNextUpdate: (options?: { timeout?: number | false }) => Promise<void>;
+  waitFor: (
+    callback: () => boolean | void,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  waitForValueToChange: (
+    selector: () => any,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  unmount: () => void;
+};
 
 export function renderHook<P, R>(
   hook: (props: P) => R,
-  options: { initialProps?: P } = {}
+  options: { initialProps: P }
+): RenderHookReturn<P, R>;
+export function renderHook<P, R>(hook: () => R): RenderHookReturnVoid<R>;
+export function renderHook<P, R>(
+  hook: (props?: P) => R,
+  options?: any
 ): RenderHookReturn<P, R> {
+  const _options: P extends unknown
+    ? undefined
+    : { initialProps: P } = options;
+
   const updateSubject = new Subject<R>();
 
   let result = new Result<R>();
 
   let state = new State(() => {
-    update(options.initialProps);
+    // options can only be undefined if P is undefined
+    update(_options?.initialProps);
   }, null);
 
-  function update(props) {
+  function update(props?: P) {
     state.run(() => {
       const res = hook(props);
       result.current = res;
@@ -66,12 +87,17 @@ export function renderHook<P, R>(
     });
   }
 
-  function rerender(newProps?: any) {
-    update(newProps);
+  function rerender(newProps?: P) {
+    if (newProps === undefined) {
+      update(_options?.initialProps);
+    } else {
+      update(newProps);
+    }
     state.runLayoutEffects();
     state.runEffects();
   }
-  rerender(options.initialProps);
+  // options can only be undefined if P is undefined
+  rerender(_options?.initialProps);
 
   async function waitForNextUpdate(options?: {
     timeout?: number | false;
@@ -138,7 +164,11 @@ export function renderHook<P, R>(
     const intervalObservable = intervalMs ? interval(intervalMs) : NEVER;
 
     const mergedPromise = merge(updateObservable, intervalObservable)
-      .pipe(filter(() => selector() !== initialValue), first(), mapTo(undefined))
+      .pipe(
+        filter(() => selector() !== initialValue),
+        first(),
+        mapTo(undefined)
+      )
       .toPromise();
 
     return mergedPromise;
