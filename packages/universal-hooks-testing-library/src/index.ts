@@ -18,16 +18,59 @@ export function setTestImplementation(lib: TestLib) {
   impl.current = lib;
 }
 
+type Result<T> = { current: T };
+
+type RenderHookReturn<P, R> = {
+  result: Result<R>;
+  rerender: (props?: P) => void;
+  waitForNextUpdate: (options?: { timeout?: number | false }) => Promise<void>;
+  waitFor: (
+    callback: () => boolean | void,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  waitForValueToChange: (
+    selector: () => any,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  unmount: () => void;
+};
+
+type RenderHookReturnVoid<R> = {
+  result: Result<R>;
+  rerender: () => void;
+  waitForNextUpdate: (options?: { timeout?: number | false }) => Promise<void>;
+  waitFor: (
+    callback: () => boolean | void,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  waitForValueToChange: (
+    selector: () => any,
+    options?: {
+      interval?: number | false;
+      timeout?: number | false;
+    }
+  ) => Promise<void>;
+  unmount: () => void;
+};
+
 export function renderHook<P, R>(
   hook: (props: P) => R,
-  options: { initialProps?: P } = {}
-): {
-  result: {
-    current: R;
-  };
-  rerender: (props?: P) => void;
-  unmount: () => void;
-} {
+  options: { initialProps: P }
+): RenderHookReturn<P, R>;
+export function renderHook<P, R>(hook: () => R): RenderHookReturnVoid<R>;
+export function renderHook(
+  hook: any,
+  options?: any,
+): any {
   return impl.current.renderHook(hook, options);
 }
 
