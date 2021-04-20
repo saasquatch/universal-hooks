@@ -23,7 +23,5 @@ jobs:
         with:
           node-version: 15.x
       - run: npm install
-      - env:
-          PACKAGES: haunted-hooks-testing-library universal-hooks universal-hooks-testing-library
-        run: for P in $PACKAGES; do npm -w packages/$P run build --if-present; done
+      - run: npm --workspaces run build --if-present
       - run: npm -w packages/${{ matrix.package }} test
