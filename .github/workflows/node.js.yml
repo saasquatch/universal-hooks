@@ -17,7 +17,7 @@ jobs:
       matrix:
         package:
           - haunted-hooks-testing-library
-          - universal-hooks
+          # - universal-hooks
           - universal-hooks-testing-library
 
     steps:
