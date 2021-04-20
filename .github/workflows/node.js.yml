@@ -18,7 +18,7 @@ jobs:
       matrix:
         package:
           - haunted-hooks-testing-library
-          # - universal-hooks
+          - universal-hooks
           - universal-hooks-testing-library
 
     steps:
@@ -29,4 +29,23 @@ jobs:
         node-version: 15.x
     - run: npm install
     - run: npm -w packages/${{ matrix.package }} run build --if-present
+
+  test:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        package:
+          - haunted-hooks-testing-library
+          # - universal-hooks
+          - universal-hooks-testing-library
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 15.x
     - run: npm -w packages/${{ matrix.package }} test 
