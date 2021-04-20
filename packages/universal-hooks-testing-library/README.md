@@ -31,7 +31,7 @@ import { setImplementation, useState } from "@saasquatch/universal-hooks";
 import { act, renderHook, setTestImplementation } from "../src";
 
 test("example", () => {
-  function hook() {
+  function useHook() {
     const [counter, setCounter] = useState(0);
     const inc = setCounter((c) => c + 1);
     return { counter, inc };
@@ -39,7 +39,7 @@ test("example", () => {
 
   let result;
   act(() => {
-    ({ result } = renderHook(hook));
+    ({ result } = renderHook(useHook));
   });
   expect(result.current.counter).toBe(0);
 
