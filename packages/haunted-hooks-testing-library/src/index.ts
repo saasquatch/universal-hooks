@@ -66,9 +66,7 @@ export function renderHook<P, R>(
   hook: (props?: P) => R,
   options?: any
 ): RenderHookReturn<P, R> {
-  const _options: P extends unknown
-    ? undefined
-    : { initialProps: P } = options;
+  const _options: P extends unknown ? undefined : { initialProps: P } = options;
 
   const updateSubject = new Subject<R>();
 
@@ -98,6 +96,12 @@ export function renderHook<P, R>(
   }
   // options can only be undefined if P is undefined
   rerender(_options?.initialProps);
+
+  function unmount() {
+    state.teardown();
+    updateSubject.unsubscribe();
+    updateSubject.complete();
+  }
 
   async function waitForNextUpdate(options?: {
     timeout?: number | false;
@@ -177,10 +181,7 @@ export function renderHook<P, R>(
   return {
     result,
     rerender,
-    unmount: () => { 
-        state.teardown()
-        // TODO: Teardown subject
-    },
+    unmount,
     waitFor,
     waitForNextUpdate,
     waitForValueToChange,
