@@ -4,8 +4,5 @@
   "version": "0.1.0",
   "workspaces": [
     "./packages/*"
-  ],
-  "dependencies": {
-    "haunted": "^4.7.1"
-  }
+  ]
 }
