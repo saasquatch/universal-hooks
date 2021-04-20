@@ -177,7 +177,10 @@ export function renderHook<P, R>(
   return {
     result,
     rerender,
-    unmount: () => state.teardown(),
+    unmount: () => { 
+        state.teardown()
+        // TODO: Teardown subject
+    },
     waitFor,
     waitForNextUpdate,
     waitForValueToChange,
