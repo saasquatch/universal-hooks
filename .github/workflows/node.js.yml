@@ -26,9 +26,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 15.x
-      - env:
-        PACKAGES: haunted-hooks-testing-library universal-hooks universal-hooks-testing-library
       - run: npm install
-      - run: for P in $PACKAGES; do npm -w packages/$P run build --if-present; done
+      - env:
+          PACKAGES: haunted-hooks-testing-library universal-hooks universal-hooks-testing-library
+        run: for P in $PACKAGES; do npm -w packages/$P run build --if-present; done
       # - run: npm -w packages/univ run build --if-present
       - run: npm -w packages/${{ matrix.package }} test
