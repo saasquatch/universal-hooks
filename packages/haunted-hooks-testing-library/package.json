@@ -2,6 +2,11 @@
   "name": "@saasquatch/haunted-hooks-testing-library",
   "version": "0.1.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/universal-hooks",
+    "directory": "packages/haunted-hooks-testing-library"
+  },
   "private": false,
   "source": "src/index.ts",
   "main": "dist/index.js",

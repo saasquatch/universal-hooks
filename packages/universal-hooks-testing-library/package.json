@@ -2,6 +2,11 @@
   "name": "@saasquatch/universal-hooks-testing-library",
   "version": "0.1.0",
   "description": "A testing library for universal-hooks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/universal-hooks",
+    "directory": "packages/universal-hooks-testing-library"
+  },
   "private": false,
   "main": "dist/index.js",
   "source": "src/index.ts",

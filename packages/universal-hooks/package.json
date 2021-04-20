@@ -2,6 +2,11 @@
   "name": "@saasquatch/universal-hooks",
   "version": "0.1.3",
   "description": "An interface and a swappable implementation that can be used to implement universal custom hooks on top of hooks.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/universal-hooks",
+    "directory": "packages/universal-hooks"
+  },
   "private": false,
   "source": "src/universal-hooks.ts",
   "main": "dist/universal-hooks.js",
