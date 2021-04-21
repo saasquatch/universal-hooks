@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/universal-hooks-testing-library",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A testing library for universal-hooks",
   "repository": {
     "type": "git",
@@ -20,8 +20,8 @@
   "license": "MIT",
   "devDependencies": {
     "@jest/types": "^26.6.2",
-    "@saasquatch/haunted-hooks-testing-library": "0.1.0",
-    "@saasquatch/universal-hooks": "^0.1.3",
+    "@saasquatch/haunted-hooks-testing-library": "^1.0.0",
+    "@saasquatch/universal-hooks": "^1.0.0",
     "@testing-library/react-hooks": "^5.1.0",
     "@types/jest": "^26.0.22",
     "@types/react": "^17.0.3",
