@@ -13,6 +13,33 @@ import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
 import * as React from "react";
 import * as ReactTestLib from "@testing-library/react-hooks";
 
+function counterHook(delay: number) {
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const ticker = setInterval(() => setCounter((c = 0) => c + 1), delay);
+    return () => clearInterval(ticker);
+  }, []);
+
+  return {
+    counter,
+    setCounter,
+  };
+}
+
+function mutableCounterHook(delay: number) {
+  const counter = useRef(0);
+
+  useEffect(() => {
+    const ticker = setInterval(() => counter.current++, delay);
+    return () => clearInterval(ticker);
+  }, []);
+
+  return {
+    counter,
+  };
+}
+
 describe("Haunted", () => {
   setImplementation(haunted);
   setTestImplementation(hauntedTestingLib);
@@ -31,18 +58,7 @@ function runTests() {
   describe("Async Utils", () => {
     describe("waitForNextUpdate", () => {
       test("default", async () => {
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForNextUpdate } = renderHook(hook);
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
         await waitForNextUpdate();
@@ -54,18 +70,7 @@ function runTests() {
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForNextUpdate } = renderHook(hook);
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -87,18 +92,7 @@ function runTests() {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 2000);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForNextUpdate } = renderHook(hook);
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(2000));
 
         expect(result.current?.counter).toBe(0);
 
@@ -115,18 +109,7 @@ function runTests() {
     describe("waitFor", () => {
       // test truthy, false, undefined, and error states
       test("resolve when callback returns truthy or undefined", async () => {
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitFor } = renderHook(hook);
+        const { result, waitFor } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -140,18 +123,7 @@ function runTests() {
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitFor } = renderHook(hook);
+        const { result, waitFor } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -173,18 +145,7 @@ function runTests() {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 2000);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitFor } = renderHook(hook);
+        const { result, waitFor } = renderHook(() => counterHook(2000));
 
         expect(result.current?.counter).toBe(0);
 
@@ -199,24 +160,7 @@ function runTests() {
 
       // use useRef to test this one, we can't trigger updates
       test("resolve during interval with no updates", async () => {
-        function hook() {
-          const counter = useRef(0);
-
-          function increment() {
-            setTimeout(() => {
-              counter.current++;
-              increment(); // this leaks memory because no TCO in Node
-            }, 10);
-          }
-
-          increment();
-
-          return {
-            counter,
-          };
-        }
-
-        const { result, waitFor } = renderHook(hook);
+        const { result, waitFor } = renderHook(() => mutableCounterHook(10));
 
         expect(result.current?.counter.current).toBe(0);
 
@@ -234,18 +178,7 @@ function runTests() {
 
     describe("waitForValueToChange", () => {
       test("resolve when value changes", async () => {
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForValueToChange } = renderHook(hook);
+        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -256,22 +189,10 @@ function runTests() {
         expect(result.current?.counter).toBe(3);
       });
 
-      //*
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 10);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForValueToChange } = renderHook(hook);
+        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -295,18 +216,7 @@ function runTests() {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        function hook() {
-          const [counter, setCounter] = useState(0);
-
-          setTimeout(() => setCounter((c = 0) => c + 1), 2000);
-
-          return {
-            counter,
-            setCounter,
-          };
-        }
-
-        const { result, waitForValueToChange } = renderHook(hook);
+        const { result, waitForValueToChange } = renderHook(() => counterHook(2000));
 
         expect(result.current?.counter).toBe(0);
 
@@ -321,24 +231,7 @@ function runTests() {
 
       // use useRef to test this one, we can't trigger updates
       test("resolve during interval with no updates", async () => {
-        function hook() {
-          const counter = useRef(0);
-
-          function increment() {
-            setTimeout(() => {
-              counter.current++;
-              increment(); // this leaks memory because no TCO in Node
-            }, 10);
-          }
-
-          increment();
-
-          return {
-            counter,
-          };
-        }
-
-        const { result, waitForValueToChange } = renderHook(hook);
+        const { result, waitForValueToChange } = renderHook(() => mutableCounterHook(10));
 
         expect(result.current?.counter.current).toBe(0);
 
