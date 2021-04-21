@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "@saasquatch/universal-hooks";
-import { act, renderHook, setTestImplementation } from "../src";
+import { act, renderHook, setTestImplementation } from "@saasquatch/universal-hooks-testing-library";
 import * as haunted from "haunted";
 import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
 import * as React from "react";
@@ -20,6 +20,8 @@ describe("Haunted", () => {
 });
 
 describe("React", () => {
+  // TODO make sure all state changes are wrapped in act
+  // this could take a while to fix
   setImplementation(React);
   setTestImplementation(ReactTestLib);
   runTests();
@@ -353,8 +355,6 @@ function runTests() {
         });
         expect(result.current?.counter.current).toBe(3);
       });
-      //*
-      //*/
     });
   });
   describe("useState", () => {
