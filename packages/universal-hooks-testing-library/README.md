@@ -27,7 +27,7 @@ setTestImplementation(hauntedTestingLib);
 Then, use it like usual.
 
 ```javascript
-import { setImplementation, useState } from "@saasquatch/universal-hooks";
+import { useState } from "@saasquatch/universal-hooks";
 import { act, renderHook, setTestImplementation } from "@saasquatch/universal-hooks-testing-library";
 
 test("example", () => {
