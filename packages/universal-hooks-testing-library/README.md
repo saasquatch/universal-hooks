@@ -1,6 +1,6 @@
 # Universal Hooks Testing Library
 
-This library provides an interface to test hooks written with Universal Hooks. You simply plug an implementation in an continue testing as usual. The API is based off of React Hooks Testing Library.
+This library provides an interface to test hooks written with Universal Hooks. You simply plug an implementation in and continue testing as usual. The API is based off of React Hooks Testing Library.
 
 ## Usage
 
