@@ -12,7 +12,10 @@ import { act, renderHook } from "../src";
 function counterHook(delay: number) {
   const [counter, setCounter] = useState(0);
 
-  setTimeout(() => setCounter((c = 0) => c + 1), delay);
+  useEffect(() => {
+    const ticker = setInterval(() => setCounter((c = 0) => c + 1), delay);
+    return () => clearInterval(ticker);
+  }, []);
 
   return {
     counter,
@@ -21,20 +24,16 @@ function counterHook(delay: number) {
 }
 
 function mutableCounterHook(delay: number) {
-    const counter = useRef(0);
+  const counter = useRef(0);
 
-    function increment() {
-      setTimeout(() => {
-        counter.current++;
-        increment(); // this leaks memory because no TCO in Node
-      }, delay)
-    }
+  useEffect(() => {
+    const ticker = setInterval(() => counter.current++, delay);
+    return () => clearInterval(ticker);
+  }, []);
 
-    increment();
-
-    return {
-      counter,
-    };
+  return {
+    counter,
+  };
 }
 
 describe("Async Utils", () => {
@@ -160,7 +159,9 @@ describe("Async Utils", () => {
 
   describe("waitForValueToChange", () => {
     test("resolve when value changes", async () => {
-      const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+      const { result, waitForValueToChange } = renderHook(() =>
+        counterHook(10)
+      );
 
       expect(result.current?.counter).toBe(0);
 
@@ -175,7 +176,9 @@ describe("Async Utils", () => {
     test("timeout expiry", async () => {
       let error: Error | undefined = undefined;
 
-      const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+      const { result, waitForValueToChange } = renderHook(() =>
+        counterHook(10)
+      );
 
       expect(result.current?.counter).toBe(0);
 
@@ -199,7 +202,9 @@ describe("Async Utils", () => {
     test("default timeout", async () => {
       let error: Error | undefined = undefined;
 
-      const { result, waitForValueToChange } = renderHook(()=>counterHook(2000));
+      const { result, waitForValueToChange } = renderHook(() =>
+        counterHook(2000)
+      );
 
       expect(result.current?.counter).toBe(0);
 
@@ -214,7 +219,9 @@ describe("Async Utils", () => {
 
     // use useRef to test this one, we can't trigger updates
     test("resolve during interval with no updates", async () => {
-      const { result, waitForValueToChange } = renderHook(() => mutableCounterHook(10));
+      const { result, waitForValueToChange } = renderHook(() =>
+        mutableCounterHook(10)
+      );
 
       expect(result.current?.counter.current).toBe(0);
 
