@@ -4,6 +4,10 @@ This library aims to provide a common interface for React-like hooks to plug int
 
 ## Usage
 
+There are two ways to plug in an implementation. You can supply a module at runtime or you can replace Universal Hooks at compile time.
+
+### Provide an implementation at runtime
+
 ```javascript
 // Set an implementation for the hooks
 setImplementation(haunted)
@@ -23,9 +27,30 @@ function useCounter() {
 }
 ```
 
+### Provide an implementation via bundlers
+
+Rollup, Webpack and other bundlers allow compile-time replacement of implementations.
+
+E.g. with the Rollup `alias` plugin https://github.com/rollup/plugins/tree/master/packages/alias
+
+To swap in React
+```js
+entries: [
+  { find: '@saasquatch/universal-hooks', replacement: 'React' },
+];
+```
+
+To swap in Haunted
+```js
+entries: [
+  { find: '@saasquatch/universal-hooks', replacement: 'haunted' },
+];
+```
+
+
 ## API
 
-It supports most hooks besides `useContext`:
+Most common hooks are supported, except for `useContext`.
 
 - useState
 - useMemo
