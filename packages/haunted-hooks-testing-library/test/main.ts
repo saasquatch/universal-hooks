@@ -6,8 +6,7 @@ import {
   useRef,
   useState,
 } from "haunted";
-import { count } from "rxjs/operators";
-import { act, renderHook } from "../src";
+import { act, renderHook } from "@saasquatch/haunted-hooks-testing-library";
 
 function counterHook(delay: number) {
   const [counter, setCounter] = useState(0);
