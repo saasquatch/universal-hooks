@@ -7,11 +7,38 @@ import {
   useRef,
   useState,
 } from "@saasquatch/universal-hooks";
-import { act, renderHook, setTestImplementation } from "../src";
+import { act, renderHook, setTestImplementation } from "@saasquatch/universal-hooks-testing-library";
 import * as haunted from "haunted";
 import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
 import * as React from "react";
 import * as ReactTestLib from "@testing-library/react-hooks";
+
+function counterHook(delay: number) {
+  const [counter, setCounter] = useState(0);
+
+  useEffect(() => {
+    const ticker = setInterval(() => setCounter((c = 0) => c + 1), delay);
+    return () => clearInterval(ticker);
+  }, []);
+
+  return {
+    counter,
+    setCounter,
+  };
+}
+
+function mutableCounterHook(delay: number) {
+  const counter = useRef(0);
+
+  useEffect(() => {
+    const ticker = setInterval(() => counter.current++, delay);
+    return () => clearInterval(ticker);
+  }, []);
+
+  return {
+    counter,
+  };
+}
 
 describe("Haunted", () => {
   setImplementation(haunted);
@@ -20,17 +47,214 @@ describe("Haunted", () => {
 });
 
 describe("React", () => {
+  // TODO make sure all state changes are wrapped in act
+  // this could take a while to fix
   setImplementation(React);
   setTestImplementation(ReactTestLib);
   runTests();
 });
 
 function runTests() {
+  describe("Async Utils", () => {
+    describe("waitForNextUpdate", () => {
+      test("default", async () => {
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+        await waitForNextUpdate();
+        expect(result.current?.counter).toBe(1);
+        await waitForNextUpdate();
+        expect(result.current?.counter).toBe(2);
+      });
+
+      test("timeout expiry", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+
+        await waitForNextUpdate();
+        expect(result.current?.counter).toBe(1);
+
+        try {
+          await waitForNextUpdate({ timeout: 1 });
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(1);
+
+        await waitForNextUpdate();
+        expect(result.current?.counter).toBe(2);
+      });
+
+      test("default timeout", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitForNextUpdate } = renderHook(() => counterHook(2000));
+
+        expect(result.current?.counter).toBe(0);
+
+        try {
+          await waitForNextUpdate();
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(0);
+      });
+    });
+
+    describe("waitFor", () => {
+      // test truthy, false, undefined, and error states
+      test("resolve when callback returns truthy or undefined", async () => {
+        const { result, waitFor } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+
+        await waitFor(() => result.current?.counter === 2);
+        expect(result.current?.counter).toBe(2);
+
+        await waitFor(() => expect(result.current?.counter).toBe(4));
+        expect(result.current?.counter).toBe(4);
+      });
+
+      test("timeout expiry", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitFor } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+
+        await waitFor(() => result.current?.counter === 1);
+        expect(result.current?.counter).toBe(1);
+
+        try {
+          await waitFor(() => result.current?.counter === 2, { timeout: 1 });
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(1);
+
+        await waitFor(() => result.current?.counter === 2);
+        expect(result.current?.counter).toBe(2);
+      });
+
+      test("default timeout", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitFor } = renderHook(() => counterHook(2000));
+
+        expect(result.current?.counter).toBe(0);
+
+        try {
+          await waitFor(() => result.current?.counter === 2);
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(0);
+      });
+
+      // use useRef to test this one, we can't trigger updates
+      test("resolve during interval with no updates", async () => {
+        const { result, waitFor } = renderHook(() => mutableCounterHook(10));
+
+        expect(result.current?.counter.current).toBe(0);
+
+        await waitFor(() => result.current?.counter.current === 2, {
+          interval: 2,
+        });
+        expect(result.current?.counter.current).toBe(2);
+
+        await waitFor(() => expect(result.current?.counter.current).toBe(4), {
+          interval: 2,
+        });
+        expect(result.current?.counter.current).toBe(4);
+      });
+    });
+
+    describe("waitForValueToChange", () => {
+      test("resolve when value changes", async () => {
+        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+
+        await waitForValueToChange(() => result.current?.counter === 2);
+        expect(result.current?.counter).toBe(2);
+
+        await waitForValueToChange(() => result.current?.counter);
+        expect(result.current?.counter).toBe(3);
+      });
+
+      test("timeout expiry", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+
+        expect(result.current?.counter).toBe(0);
+
+        await waitForValueToChange(() => result.current?.counter === 1);
+        expect(result.current?.counter).toBe(1);
+
+        try {
+          await waitForValueToChange(() => result.current?.counter, {
+            timeout: 1,
+          });
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(1);
+
+        await waitForValueToChange(() => result.current?.counter);
+        expect(result.current?.counter).toBe(2);
+      });
+
+      test("default timeout", async () => {
+        let error: Error | undefined = undefined;
+
+        const { result, waitForValueToChange } = renderHook(() => counterHook(2000));
+
+        expect(result.current?.counter).toBe(0);
+
+        try {
+          await waitForValueToChange(() => result.current?.counter);
+        } catch (e) {
+          error = e;
+        }
+        expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
+        expect(result.current?.counter).toBe(0);
+      });
+
+      // use useRef to test this one, we can't trigger updates
+      test("resolve during interval with no updates", async () => {
+        const { result, waitForValueToChange } = renderHook(() => mutableCounterHook(10));
+
+        expect(result.current?.counter.current).toBe(0);
+
+        await waitForValueToChange(
+          () => result.current?.counter.current === 2,
+          {
+            interval: 2,
+          }
+        );
+        expect(result.current?.counter.current).toBe(2);
+
+        await waitForValueToChange(() => result.current?.counter.current, {
+          interval: 2,
+        });
+        expect(result.current?.counter.current).toBe(3);
+      });
+    });
+  });
   describe("useState", () => {
     test("no props", () => {
       let result;
       act(() => {
-        result = renderHook(useState)["result"];
+        result = renderHook(() => useState(undefined))["result"];
       });
 
       expect(result.current[0]).toBeUndefined();
