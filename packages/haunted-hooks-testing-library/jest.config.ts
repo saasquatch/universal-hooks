@@ -7,7 +7,12 @@ const config: Config.InitialOptions = {
   transform: {
     "^.+\\.(ts|tsx|js|jsx)$": "ts-jest",
   },
-  transformIgnorePatterns: [`node_modules/(?!(${esModules}))`]
+  transformIgnorePatterns: [`node_modules/(?!(${esModules}))`],
+  globals: {
+    "ts-jest": {
+      tsconfig: "test/tsconfig.json"
+    }
+  }
 };
 
 export default config;
