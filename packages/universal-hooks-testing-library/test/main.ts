@@ -41,20 +41,27 @@ function mutableCounterHook(delay: number) {
 }
 
 describe("Haunted", () => {
-  setImplementation(haunted);
-  setTestImplementation(hauntedTestingLib);
-  runTests();
+  runTests(haunted, hauntedTestingLib);
 });
 
 describe("React", () => {
   // TODO make sure all state changes are wrapped in act
   // this could take a while to fix
-  setImplementation(React);
-  setTestImplementation(ReactTestLib);
-  runTests();
+  runTests(React, ReactTestLib);
 });
 
-function runTests() {
+// function runTests() {
+function runTests(hookLib: any, testingLib: any) {
+  beforeAll(()=>{
+    setImplementation(hookLib) 
+    setTestImplementation(testingLib)
+  })
+
+  afterAll(()=>{
+    setImplementation(null);
+    setTestImplementation(null);
+  })
+
   describe("Async Utils", () => {
     describe("waitForNextUpdate", () => {
       test("default", async () => {
