@@ -7,11 +7,11 @@ import {
   useRef,
   useState,
 } from "@saasquatch/universal-hooks";
-import { act, renderHook, setTestImplementation } from "@saasquatch/universal-hooks-testing-library";
-import * as haunted from "haunted";
-import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
-import * as React from "react";
-import * as ReactTestLib from "@testing-library/react-hooks";
+import {
+  act,
+  renderHook,
+  setTestImplementation,
+} from "@saasquatch/universal-hooks-testing-library";
 
 function counterHook(delay: number) {
   const [counter, setCounter] = useState(0);
@@ -39,28 +39,17 @@ function mutableCounterHook(delay: number) {
     counter,
   };
 }
-// FIXME async utils and useEffect fail if haunted is above react
-describe("React", () => {
-  // TODO make sure all state changes are wrapped in act
-  // this could take a while to fix
-  // runTests({...React, useState: (a: any) => (console.log("React useState"), useState(a))}, ReactTestLib);
-  runTests(React, ReactTestLib);
-});
 
-describe("Haunted", () => {
-  runTests(haunted, hauntedTestingLib);
-});
+export function runTests(hookLib: any, testingLib: any) {
+  beforeAll(() => {
+    setImplementation(hookLib);
+    setTestImplementation(testingLib);
+  });
 
-function runTests(hookLib: any, testingLib: any) {
-  beforeAll(()=>{
-    setImplementation(hookLib) 
-    setTestImplementation(testingLib)
-  })
-
-  afterAll(()=>{
+  afterAll(() => {
     setImplementation(null);
     setTestImplementation(null);
-  })
+  });
 
   describe("Async Utils", () => {
     describe("waitForNextUpdate", () => {
@@ -99,7 +88,9 @@ function runTests(hookLib: any, testingLib: any) {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForNextUpdate } = renderHook(() => counterHook(2000));
+        const { result, waitForNextUpdate } = renderHook(() =>
+          counterHook(2000)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -185,7 +176,9 @@ function runTests(hookLib: any, testingLib: any) {
 
     describe("waitForValueToChange", () => {
       test("resolve when value changes", async () => {
-        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(10)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -199,7 +192,9 @@ function runTests(hookLib: any, testingLib: any) {
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(10)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -223,7 +218,9 @@ function runTests(hookLib: any, testingLib: any) {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForValueToChange } = renderHook(() => counterHook(2000));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(2000)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -238,7 +235,9 @@ function runTests(hookLib: any, testingLib: any) {
 
       // use useRef to test this one, we can't trigger updates
       test("resolve during interval with no updates", async () => {
-        const { result, waitForValueToChange } = renderHook(() => mutableCounterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          mutableCounterHook(10)
+        );
 
         expect(result.current?.counter.current).toBe(0);
 
