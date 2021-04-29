@@ -39,18 +39,18 @@ function mutableCounterHook(delay: number) {
     counter,
   };
 }
+// FIXME async utils and useEffect fail if haunted is above react
+describe("React", () => {
+  // TODO make sure all state changes are wrapped in act
+  // this could take a while to fix
+  // runTests({...React, useState: (a: any) => (console.log("React useState"), useState(a))}, ReactTestLib);
+  runTests(React, ReactTestLib);
+});
 
 describe("Haunted", () => {
   runTests(haunted, hauntedTestingLib);
 });
 
-describe("React", () => {
-  // TODO make sure all state changes are wrapped in act
-  // this could take a while to fix
-  runTests(React, ReactTestLib);
-});
-
-// function runTests() {
 function runTests(hookLib: any, testingLib: any) {
   beforeAll(()=>{
     setImplementation(hookLib) 
