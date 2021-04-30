@@ -12,10 +12,6 @@ import {
   renderHook,
   setTestImplementation,
 } from "@saasquatch/universal-hooks-testing-library";
-import * as haunted from "haunted";
-import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
-import * as React from "react";
-import * as ReactTestLib from "@testing-library/react-hooks";
 
 function counterHook(delay: number) {
   const [counter, setCounter] = useState(0);
@@ -43,19 +39,8 @@ function mutableCounterHook(delay: number) {
     counter,
   };
 }
-// FIXME async utils and useEffect fail if haunted is above react
-describe("React", () => {
-  // TODO make sure all state changes are wrapped in act
-  // this could take a while to fix
-  // runTests({...React, useState: (a: any) => (console.log("React useState"), useState(a))}, ReactTestLib);
-  runTests(React, ReactTestLib);
-});
 
-describe("Haunted", () => {
-  runTests(haunted, hauntedTestingLib);
-});
-
-function runTests(hookLib: any, testingLib: any) {
+export function runTests(hookLib: any, testingLib: any) {
   beforeAll(() => {
     setImplementation(hookLib);
     setTestImplementation(testingLib);
@@ -122,7 +107,7 @@ function runTests(hookLib: any, testingLib: any) {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForNextUpdate, unmount } = renderHook(() =>
+        const { result, waitForNextUpdate } = renderHook(() =>
           counterHook(2000)
         );
 
