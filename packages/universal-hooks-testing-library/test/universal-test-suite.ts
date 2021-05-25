@@ -7,11 +7,11 @@ import {
   useRef,
   useState,
 } from "@saasquatch/universal-hooks";
-import { act, renderHook, setTestImplementation } from "@saasquatch/universal-hooks-testing-library";
-import * as haunted from "haunted";
-import * as hauntedTestingLib from "@saasquatch/haunted-hooks-testing-library";
-import * as React from "react";
-import * as ReactTestLib from "@testing-library/react-hooks";
+import {
+  act,
+  renderHook,
+  setTestImplementation,
+} from "@saasquatch/universal-hooks-testing-library";
 
 function counterHook(delay: number) {
   const [counter, setCounter] = useState(0);
@@ -40,37 +40,51 @@ function mutableCounterHook(delay: number) {
   };
 }
 
-describe("Haunted", () => {
-  setImplementation(haunted);
-  setTestImplementation(hauntedTestingLib);
-  runTests();
-});
+export function runTests(hookLib: any, testingLib: any) {
+  beforeAll(() => {
+    setImplementation(hookLib);
+    setTestImplementation(testingLib);
+  });
 
-describe("React", () => {
-  // TODO make sure all state changes are wrapped in act
-  // this could take a while to fix
-  setImplementation(React);
-  setTestImplementation(ReactTestLib);
-  runTests();
-});
+  afterAll(() => {
+    setImplementation(null);
+    setTestImplementation(null);
+  });
 
-function runTests() {
   describe("Async Utils", () => {
     describe("waitForNextUpdate", () => {
       test("default", async () => {
-        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
+        let result: any;
+        let waitForNextUpdate: Function;
+
+        console.log("==================== START ====================");
+        await act(async () => {
+          ({ result, waitForNextUpdate } = renderHook(() => counterHook(10)));
+        });
+        console.log("after assignment");
 
         expect(result.current?.counter).toBe(0);
+        console.log("after assertion 1");
+
+        // FIXME error is caused here
         await waitForNextUpdate();
+        console.log("after wait 1");
         expect(result.current?.counter).toBe(1);
+        console.log("after assertion 2");
+
         await waitForNextUpdate();
+        console.log("after wait 2");
         expect(result.current?.counter).toBe(2);
+        console.log("after assertion 3");
+        console.log("==================== STOP ====================");
       });
 
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForNextUpdate } = renderHook(() => counterHook(10));
+        const { result, waitForNextUpdate, unmount } = renderHook(() =>
+          counterHook(10)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -87,12 +101,15 @@ function runTests() {
 
         await waitForNextUpdate();
         expect(result.current?.counter).toBe(2);
+        // unmount();
       });
 
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForNextUpdate } = renderHook(() => counterHook(2000));
+        const { result, waitForNextUpdate } = renderHook(() =>
+          counterHook(2000)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -103,13 +120,14 @@ function runTests() {
         }
         expect(error?.name).toMatch(/^(TimeoutError|Error)$/);
         expect(result.current?.counter).toBe(0);
+        // unmount();
       });
     });
 
     describe("waitFor", () => {
       // test truthy, false, undefined, and error states
       test("resolve when callback returns truthy or undefined", async () => {
-        const { result, waitFor } = renderHook(() => counterHook(10));
+        const { result, waitFor, unmount } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -118,12 +136,13 @@ function runTests() {
 
         await waitFor(() => expect(result.current?.counter).toBe(4));
         expect(result.current?.counter).toBe(4);
+        // unmount();
       });
 
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitFor } = renderHook(() => counterHook(10));
+        const { result, waitFor, unmount } = renderHook(() => counterHook(10));
 
         expect(result.current?.counter).toBe(0);
 
@@ -140,6 +159,7 @@ function runTests() {
 
         await waitFor(() => result.current?.counter === 2);
         expect(result.current?.counter).toBe(2);
+        // unmount();
       });
 
       test("default timeout", async () => {
@@ -178,7 +198,9 @@ function runTests() {
 
     describe("waitForValueToChange", () => {
       test("resolve when value changes", async () => {
-        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(10)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -192,7 +214,9 @@ function runTests() {
       test("timeout expiry", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForValueToChange } = renderHook(() => counterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(10)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -216,7 +240,9 @@ function runTests() {
       test("default timeout", async () => {
         let error: Error | undefined = undefined;
 
-        const { result, waitForValueToChange } = renderHook(() => counterHook(2000));
+        const { result, waitForValueToChange } = renderHook(() =>
+          counterHook(2000)
+        );
 
         expect(result.current?.counter).toBe(0);
 
@@ -231,7 +257,9 @@ function runTests() {
 
       // use useRef to test this one, we can't trigger updates
       test("resolve during interval with no updates", async () => {
-        const { result, waitForValueToChange } = renderHook(() => mutableCounterHook(10));
+        const { result, waitForValueToChange } = renderHook(() =>
+          mutableCounterHook(10)
+        );
 
         expect(result.current?.counter.current).toBe(0);
 
@@ -367,7 +395,7 @@ function runTests() {
   });
 
   describe("useEffect", () => {
-    test("no dependencies", () => {
+    test("no dependencies", async () => {
       function myHook() {
         const [stateA, setStateA] = useState("A");
         const [stateB, setStateB] = useState("B");
@@ -380,22 +408,36 @@ function runTests() {
         return { stateA, stateB, setStateA, setStateB };
       }
 
-      const { result, rerender } = renderHook(myHook);
+      let result: any;
+      let waitForNextUpdate: Function;
+      let waitFor: Function;
+      await act(async () => {
+        ({ result, waitForNextUpdate, waitFor } = renderHook(myHook));
+        await waitFor(() => result.current.stateA !== "A");
+      });
 
       expect(result.current.stateA).toBe("Triggered A");
       expect(result.current.stateB).toBe("Triggered B");
 
-      act(() => {
+      console.log("passed test 1 :)");
+
+      await act(async () => {
         result.current.setStateA("AA");
+        await waitFor(() => result.current.stateA === "AA");
       });
       expect(result.current.stateA).toBe("AA");
       expect(result.current.stateB).toBe("Triggered B");
 
-      act(() => {
+      console.log("passed test 2 :)");
+
+      await act(async () => {
         result.current.setStateB("BB");
+        await waitFor(() => result.current.stateB === "BB");
       });
       expect(result.current.stateA).toBe("AA");
       expect(result.current.stateB).toBe("BB");
+
+      console.log("passed test 3 :)");
     });
 
     test("dependency", async () => {
