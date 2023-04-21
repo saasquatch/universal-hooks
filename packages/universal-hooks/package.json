@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/universal-hooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An interface and a swappable implementation that can be used to implement universal custom hooks on top of hooks.",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   "files": [
     "dist"
   ],
-  "author": "",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "license": "MIT",
   "devDependencies": {
     "microbundle": "^0.13.0"
