@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/haunted-hooks-testing-library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "test": "jest",
     "test-watch": "jest --watch"
   },
-  "author": "",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "license": "MIT",
   "devDependencies": {
     "@testing-library/react-hooks": "^5.1.0",
