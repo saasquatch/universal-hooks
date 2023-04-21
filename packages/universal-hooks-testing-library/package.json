@@ -1,6 +1,6 @@
 {
   "name": "@saasquatch/universal-hooks-testing-library",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A testing library for universal-hooks",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "test": "jest",
     "test-watch": "jest --watch"
   },
-  "author": "",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "license": "MIT",
   "devDependencies": {
     "@jest/types": "^26.6.2",
